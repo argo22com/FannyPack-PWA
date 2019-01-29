@@ -1,0 +1,5 @@
+query getMatrix($roomName: String!){
+        room(name: $roomName){
+            matrix
+        }
+     }

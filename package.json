@@ -1,0 +1,39 @@
+{
+  "name": "settleup",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@material-ui/core": "^3.5.1",
+    "@material-ui/icons": "^3.0.1",
+    "@types/graphql": "^14.0.3",
+    "@types/react-redux": "^6.0.11",
+    "apollo-boost": "^0.1.22",
+    "graphql": "^14.0.2",
+    "graphql-tag": "^2.10.0",
+    "immutable": "^4.0.0-rc.12",
+    "react": "^16.7.0-alpha.2",
+    "react-apollo": "^2.3.1",
+    "react-dom": "^16.7.0-alpha.2",
+    "react-graph-vis": "^1.0.2",
+    "react-redux": "^6.0.0",
+    "react-scripts-ts": "3.1.0",
+    "redux-thunk": "^2.3.0"
+  },
+  "scripts": {
+    "start": "react-scripts-ts start",
+    "build": "react-scripts-ts build",
+    "test": "react-scripts-ts test --env=jsdom",
+    "eject": "react-scripts-ts eject",
+    "introspect": "apollo-codegen introspect-schema http://localhost:8000/graphql/ --output src/api/schema.json",
+    "generate": "apollo-codegen generate src/generated-models/*.graphql --schema src/api/schema.json --target typescript --output src/generated-models/generated-types.ts --addTypename"
+  },
+  "devDependencies": {
+    "@types/jest": "^23.3.9",
+    "@types/node": "^10.12.10",
+    "@types/react": "^16.4.7",
+    "@types/react-dom": "^16.0.6",
+    "redux-devtools-extension": "^2.13.7",
+    "typescript": "^3.1.6",
+    "apollo-link-context": "latest"
+  }
+}
