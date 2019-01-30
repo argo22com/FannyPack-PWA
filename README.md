@@ -12,7 +12,7 @@ create ```env.ts``` in root directiory, use ```env-sample.ts``` as template.
 #### Start app
 run ```yarn start```
 #### Bundle
-run ```yarn bundle```
+run ```yarn build```
 #### Fetch GraphQL schema
 run ```yarn introspect```
 #### Generate types (must have schema fetched)
