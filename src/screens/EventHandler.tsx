@@ -19,8 +19,8 @@ interface Props extends StateToProps {
 const EventHandler = (props: Props) =>
     <CustomizedSnackbar
         open={props.eventOpen}
-        message={props.eventProps.message}
-        variant={props.eventProps.variant}
+        message={props.eventProps ? props.eventProps.message : ''}
+        variant={props.eventProps ? props.eventProps.variant : eventVariant.INFO}
     />;
 
 

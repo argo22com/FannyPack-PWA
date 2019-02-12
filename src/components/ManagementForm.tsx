@@ -10,13 +10,13 @@ import DialogTitle from "@material-ui/core/DialogTitle/DialogTitle";
 import Dialog from "@material-ui/core/Dialog/Dialog";
 import Button from "@material-ui/core/Button/Button";
 import DialogActions from "@material-ui/core/DialogActions/DialogActions";
-import {Room_getRooms, Room_getRooms_users} from "../generated-models/generated-types";
 import MultiSelection from "./MultiSelection";
 import InputLabel from "@material-ui/core/InputLabel/InputLabel";
 import Input from "@material-ui/core/Input/Input";
 import MenuItem from "@material-ui/core/MenuItem/MenuItem";
 import Select from "@material-ui/core/Select/Select";
 import Typography from "@material-ui/core/Typography/Typography";
+import {RoomBasicFragment, UserBasicFragment} from "../generated-models/generated-types";
 
 const styles = (theme: Theme) => (createStyles({
     container: {
@@ -37,9 +37,9 @@ interface Props extends WithStyles<typeof styles> {
     open: boolean,
     submitAction: (values: formValues) => void,
     cancelAction: () => void,
-    allUsers: Room_getRooms_users[],
-    freeUsers: Room_getRooms_users[],
-    roomsToJoin: Room_getRooms[],
+    allUsers: UserBasicFragment[],
+    freeUsers: UserBasicFragment[],
+    roomsToJoin: RoomBasicFragment[],
     fullscreen: boolean,
 }
 
@@ -47,9 +47,9 @@ export interface formValues {
     name: string,
     roomId: string,
     type: menuItems,
-    users?: Room_getRooms_users[],
+    users?: UserBasicFragment[],
     password?: string,
-    room: Room_getRooms,
+    room: RoomBasicFragment,
 }
 
 const ManagementForm = (props: Props) => {
@@ -62,7 +62,7 @@ const ManagementForm = (props: Props) => {
         room: {
             id: '',
             name: '',
-            __typename: "RoomType"
+            __typename: "RoomNode"
         }
     });
 

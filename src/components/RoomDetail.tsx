@@ -8,7 +8,6 @@ import Typography from "@material-ui/core/Typography/Typography";
 import PledgerIcon from "@material-ui/icons/LocalAtmOutlined";
 import PaymentIcon from "@material-ui/icons/PaymentOutlined";
 import Grid from "@material-ui/core/Grid/Grid";
-import {getPayments_getPayments} from "../generated-models/generated-types";
 import IconButton from "@material-ui/core/IconButton/IconButton";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction/ListItemSecondaryAction";
 import ListItemText from "@material-ui/core/ListItemText/ListItemText";
@@ -21,6 +20,11 @@ import ShowMoreIcon from '@material-ui/icons/KeyboardArrowUp';
 import DialogContent from "@material-ui/core/DialogContent/DialogContent";
 import Dialog from "@material-ui/core/Dialog/Dialog";
 import CenteredMessage from "./CenteredMessage";
+import {withRoomGraphql} from "../models/withRoom";
+import {MeQuery, PaymentFragment, RoomQuery, RoomQueryVariables} from "../generated-models/generated-types";
+import {QueryResult} from "react-apollo";
+import {withMeGraphql} from "../models/withMe";
+import {Omit} from "react-redux";
 
 
 const styles = (theme: Theme) => (createStyles({
@@ -53,7 +57,7 @@ const styles = (theme: Theme) => (createStyles({
         fontWeight: theme.typography.fontWeightRegular,
     },
     extendedIcon: {
-        '&:hover' :{
+        '&:hover': {
             cursor: 'pointer',
         },
         color: theme.palette.primary.main,
@@ -72,23 +76,26 @@ const styles = (theme: Theme) => (createStyles({
 }));
 
 interface Props extends WithStyles<typeof styles> {
-    name: string,
-    pledger: string,
-    totalMoney: number,
-    payments: getPayments_getPayments[],
+    id: string,
     onRemovePayment: (id: string) => void,
+    data: RoomQuery & QueryResult<RoomQuery, RoomQueryVariables>
+    me: MeQuery & QueryResult
 }
 
 const RoomDetailCard: FunctionComponent<Props> = (props: Props) => {
     const [open, setOpen] = useState(false);
 
-    const {classes, pledger, totalMoney, payments} = props;
+    if (!props.data.room) {
+        return null; // TODO: spinner
+    }
 
-    if (!payments.length) {
+    const {classes, data: {room}} = props;
+
+    if (room.paymentSet.edges.length === 0) {
         return <CenteredMessage text={"Click bellow to add payment"}/>
     }
 
-    const handleDelete = (payment: getPayments_getPayments) => (event: any) => {
+    const handleDelete = (payment: PaymentFragment) => (event: any) => {
         props.onRemovePayment(payment.id)
     };
 
@@ -100,62 +107,59 @@ const RoomDetailCard: FunctionComponent<Props> = (props: Props) => {
         setOpen(true)
     };
 
-    const renderList = (list: getPayments_getPayments[], fullInfo: boolean) =>
+    const renderList = (list: PaymentFragment[], fullInfo: boolean) =>
         <List dense={true} disablePadding={true}>
-            {list.map(payment =>{
-                const info = fullInfo ? `${Math.abs(payment.amount)} Kč for ${payment.pledger.username}`
-                    : '';
-                const timestamp = new Date(Date.parse(payment.date)).toLocaleDateString();
-                return (
-                <ListItem key={payment.id} className={classes.list_item}>
-                    <ListItemAvatar>
-                        <Avatar className={classes.avatar}>
-                            {payment.drawee.username.charAt(0)}
-                        </Avatar>
-                    </ListItemAvatar>
-                    <ListItemText
-                        primary={payment.name}
-                        secondary={
-                            <React.Fragment>
-                                <Typography component="span" color="textPrimary" noWrap>
-                                    {info}
-                                </Typography>
-                                {timestamp}
-                            </React.Fragment>}
-                    />
-                    <ListItemSecondaryAction>
-                        <IconButton aria-label="Delete" onClick={handleDelete(payment)} disableRipple={true} >
-                            <DeleteIcon />
-                        </IconButton>
-                    </ListItemSecondaryAction>
-                </ListItem>
-                )}
+            {list.map(payment => {
+                    // TODO: use payment
+                    const info = fullInfo ? `${Math.abs(1)} Kč for ${payment.pledger.username}`
+                        : '';
+                    const timestamp = new Date(Date.parse(payment.date)).toLocaleDateString();
+                    return (
+                        <ListItem key={payment.id} className={classes.list_item}>
+                            <ListItemAvatar>
+                                <Avatar className={classes.avatar}>
+                                    Č {/* TODO: use user */}
+                                </Avatar>
+                            </ListItemAvatar>
+                            <ListItemText
+                                primary={payment.name}
+                                secondary={
+                                    <React.Fragment>
+                                        <Typography component="span" color="textPrimary" noWrap>
+                                            {info}
+                                        </Typography>
+                                        {timestamp}
+                                    </React.Fragment>}
+                            />
+                            <ListItemSecondaryAction>
+                                <IconButton aria-label="Delete" onClick={handleDelete(payment)} disableRipple={true}>
+                                    <DeleteIcon/>
+                                </IconButton>
+                            </ListItemSecondaryAction>
+                        </ListItem>
+                    )
+                }
             )}
         </List>;
 
     const renderPayments = () => {
-        let paymentsToView: getPayments_getPayments[] = [];
-        const render = payments.length > 0;
-
-        if (render){
-            paymentsToView.push(payments[0]);
-        } else {
-            return ( <>No payments yet</> )
+        if (props.data.room.paymentSet.edges.length === 0) {
+            return (<>No payments yet</>)
         }
-
-        return renderList(paymentsToView, false);
+        return renderList(props.data.room.paymentSet.edges.map(e => e.node), false);
     };
 
     return (
         <div className={classes.root}>
-            <Grid container spacing={8} direction={"row"} justify={"space-between"} alignItems={"flex-end"} wrap={"nowrap"}>
+            <Grid container spacing={8} direction={"row"} justify={"space-between"} alignItems={"flex-end"}
+                  wrap={"nowrap"}>
                 <Grid item>
                     <Grid container spacing={8} direction={"column"}>
                         <Grid item xs>
                             <Card className={classes.card}>
                                 <PaymentIcon className={classes.icon}/>
                                 <Typography variant={"subtitle2"} color={"primary"}>
-                                    {pledger}
+                                    {props.me.me ? props.me.me.username : 'Loading...'}
                                 </Typography>
                             </Card>
                         </Grid>
@@ -163,7 +167,8 @@ const RoomDetailCard: FunctionComponent<Props> = (props: Props) => {
                             <Card className={classes.card}>
                                 <PledgerIcon className={classes.icon}/>
                                 <Typography variant={"subtitle2"} color={"primary"}>
-                                    {totalMoney.toFixed(2)}
+                                    {/*{totalMoney.toFixed(2)} TODO: use money */}
+                                    1337
                                 </Typography>
                             </Card>
                         </Grid>
@@ -171,13 +176,13 @@ const RoomDetailCard: FunctionComponent<Props> = (props: Props) => {
                 </Grid>
                 <Grid item>
                     <Grid container alignItems={"flex-end"}>
-                        <Grid item xs style={{ flexGrow: 2}}>
+                        <Grid item xs style={{flexGrow: 2}}>
                             <Card className={classes.wide_card}>
                                 <div style={{
                                     display: 'flex',
                                     justifyContent: 'center'
                                 }}>
-                                    <ShowMoreIcon className={classes.extendedIcon} onClick={renderAllPayments} />
+                                    <ShowMoreIcon className={classes.extendedIcon} onClick={renderAllPayments}/>
                                 </div>
                                 {renderPayments()}
                             </Card>
@@ -185,13 +190,13 @@ const RoomDetailCard: FunctionComponent<Props> = (props: Props) => {
                     </Grid>
                 </Grid>
             </Grid>
-            <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title"  >
-                <DialogContent style={{ padding: 0}}>
-                    {renderList(payments, true)}
+            <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
+                <DialogContent style={{padding: 0}}>
+                    {renderList(props.data.room.paymentSet.edges.map(e => e.node), true)}
                 </DialogContent>
             </Dialog>
-        </ div>
-)
+        </div>
+    )
 };
 
-export default withStyles(styles)(RoomDetailCard)
+export default withStyles(styles)(withRoomGraphql<Omit<Props, 'me'>>()(withMeGraphql<Props>()(RoomDetailCard)))

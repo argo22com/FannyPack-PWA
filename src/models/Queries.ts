@@ -1,63 +1,99 @@
 import gql from "graphql-tag";
 
-export const getRoomsQuery = gql`
-    query Room {
-      getRooms {
+const roomBasicFragment = gql`
+    fragment RoomBasic on RoomNode {
         id
         name
-        secret
-      }
     }
 `;
-
-export const getUsersQuery = gql`
-    query{
-      users{
-        id
-        username
-        rooms {
-            id
-            name
-            secret
-        }
-      }
-    }
-`;
-
-export const getUsersInRoomQuery = gql`
-    query getUsersInRoom($roomId: String!){
-        users(roomId: $roomId){
+export const meQuery = gql`
+    query Me {
+        me {
             id
             username
-            balance
+            email
+            rooms {
+                edges {
+                    node {
+                        ...RoomBasic
+                    }
+                }
+            }
         }
+    }
+    ${roomBasicFragment}
+`;
+
+const userBasicFragment = gql`
+    fragment UserBasic on UserNode {
+        id
+        username
     }
 `;
 
-
-export const getMatrixQuery = gql`
-    query getMatrix($roomId: String!){
-        room(roomId: $roomId){
-            matrix
-            totalBalance
-            biggestPledger
-        }
-     }
-`;
-
-export const getPaymentsQuery = gql`
-    query getPayments($roomId: String!){
-      getPayments(roomId:$roomId){
+const paymentFragment = gql`
+    fragment Payment on PaymentNode {
         id
-        drawee{
-          username
-        }
-        pledger{
-          username
-        }
-        amount
         date
         name
-      }
-}
+        amount
+        pledger {
+            ...UserBasic
+        }
+        splitSet {
+            edges {
+                node {
+                    id
+                    amount
+                    user {
+                        ...UserBasic
+                    }
+                }
+            }
+        }
+    }
+    ${userBasicFragment}
+`
+
+export const roomQuery = gql`
+    query Room ($id: ID!) {
+        room(id: $id) {
+            id
+            name
+            paymentSet {
+                edges {
+                    node {
+                        ...Payment
+                    }
+                }
+            }
+            userSet {
+                edges {
+                    node {
+                        ...UserBasic
+                    }
+                }
+            }
+            balances {
+                debts
+                payments
+                balance
+                user {
+                    ...UserBasic
+                }
+            }
+            resolution {
+                payer {
+                    ...UserBasic
+                }
+                recipient {
+                    ...UserBasic
+                }
+                amount
+            }
+            
+        }
+    }
+    ${userBasicFragment}
+    ${paymentFragment}
 `;

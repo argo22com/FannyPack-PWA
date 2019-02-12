@@ -1,0 +1,19 @@
+{
+  "schema": {
+    "request": {
+      "url": "http://localhost:8080/graphql/",
+      "method": "POST",
+      "postIntrospectionQuery": true
+    }
+  },
+  "endpoints": [
+    {
+      "url": "http://localhost:8080/graphql/",
+      "options": {
+        "headers": {
+          "user-agent": "JS GraphQL"
+        }
+      }
+    }
+  ]
+}

@@ -1,4 +1,3 @@
-import {Room_getRooms_users} from "../generated-models/generated-types";
 import * as React from "react";
 import {forwardRef, useImperativeMethods, useState} from "react";
 import MenuItem from "@material-ui/core/MenuItem/MenuItem";
@@ -9,6 +8,7 @@ import InputLabel from "@material-ui/core/InputLabel/InputLabel";
 import {Theme, WithStyles} from "@material-ui/core";
 import createStyles from "@material-ui/core/styles/createStyles";
 import withStyles from "@material-ui/core/styles/withStyles";
+import {UserBasicFragment} from "../generated-models/generated-types";
 
 const styles = (theme: Theme) => (createStyles({
     chip: {
@@ -38,15 +38,15 @@ const MenuProps = {
 };
 
 interface Props extends WithStyles<typeof styles> {
-    users: (Room_getRooms_users[]),
+    users: (UserBasicFragment[]),
     label: string,
     single: boolean,
 }
 
 const Selection = forwardRef((props: Props, ref) => {
-        const [selectedUsers, setSelectedUsers] = useState<Room_getRooms_users[]>([]);
+        const [selectedUsers, setSelectedUsers] = useState<UserBasicFragment[]>([]);
         const [selectedUsernames, setSelectedUsersnames] = useState<string[]>([]);
-        const [singleUser, setSingleUser] = useState<Room_getRooms_users>(props.users[0]);
+        const [singleUser, setSingleUser] = useState<UserBasicFragment>(props.users[0]);
 
         useImperativeMethods(ref, () => ({
             getSelected() {
@@ -56,13 +56,13 @@ const Selection = forwardRef((props: Props, ref) => {
 
         const {users, classes} = props;
 
-        const getStyles = (user: Room_getRooms_users) => {
+        const getStyles = (user: UserBasicFragment) => {
             const found = selectedUsers.find(entry => entry.username === user.username);
             return found ? classes.optionSelected : classes.option
         };
 
         const updateSelectedUsers = (usernames: string[]) => {
-            let userObjs: Room_getRooms_users[] = [];
+            let userObjs: UserBasicFragment[] = [];
             usernames.forEach((username: string) => {
                 const userObj = users.find((user) => (user.username === username));
 
@@ -111,7 +111,7 @@ const Selection = forwardRef((props: Props, ref) => {
                     }
                     MenuProps={MenuProps}
                 >
-                    {users.map((user: Room_getRooms_users) => (
+                    {users.map((user: UserBasicFragment) => (
                         <MenuItem key={user.id} value={user.username} className={getStyles(user)}>
                             {user.username}
                         </MenuItem>
@@ -137,7 +137,7 @@ const Selection = forwardRef((props: Props, ref) => {
                     )}
                     MenuProps={MenuProps}
                 >
-                    {users.map((user: Room_getRooms_users) => (
+                    {users.map((user: UserBasicFragment) => (
                         <MenuItem key={user.id} value={user.username} className={getStyles(user)}>
                             {user.username}
                         </MenuItem>

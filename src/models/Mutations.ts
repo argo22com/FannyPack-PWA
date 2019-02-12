@@ -1,68 +1,63 @@
 import gql from "graphql-tag";
 
 export const addPaymentMutation = gql`
-    mutation addPayment($drawee: String!, $pledger: String!, $name: String!, $roomId: String!, $amount: Float!) {
-      makePayment(
-        drawee: $drawee,
-        pledger: $pledger,
-        roomId: $roomId,
-        amount: $amount,
-        name: $name,
-      ) {
-        matrix {
-          matrix
-          totalBalance
-          biggestPledger
-        }
+    mutation addPayment($pledgerId: ID!, $name: String!, $roomId: ID!, $splits: [SplitInputType]!, $datetime: DateTime!) {
+        paymentCreate (
+            input: {
+                pledgerId: $pledgerId,
+                roomId: $roomId,
+                name: $name,
+                splits: $splits,
+                datetime: $datetime
+            }
+        ) {
+            payment {
+                id
+            }
         }
     }
 `;
 
 export const removePaymentMutation = gql`
-    mutation deletePayment($id: String!){
-      deletePayment(id: $id){
-        message
-      }
+    mutation deletePayment($id: ID!){
+        paymentDelete(input: {id: $id}){
+            success
+        }
     }
 `;
 
 export const createRoomMutation = gql`
     mutation createRoom($name: String!){
-       createRoom(name: $name) {
-         room {
-           id
-           name
-         }
-       }
+        roomCreate(input: {name: $name}) {
+            room {
+                id
+                name
+            }
+        }
     }
 `;
 
 
 export const addUserToRoomMutation = gql`
-    mutation addUserToRoom($roomId: String!, $username: String!, $secret: String) {
-       addUserToRoom(username: $username, roomId: $roomId, secret: $secret){
-        user{
-           id
-           username
-           rooms{
-             id
-             name
-           }    
-        }  
-   }
- }
+    mutation addUserToRoom($roomId: ID!, $userId: ID!, $secret: String) {
+        roomAddUser(input: {userId: $userId, roomId: $roomId, secret: $secret}){
+            user{
+                id
+                username
+            }
+        }
+    }
 `;
 
 export const createUserMutation = gql`
     mutation createUser($username: String!, $password: String!, $email: String!) {
-       createUser(username: $username, password: $password, email: $email){
-        user{
-           id
-           username
-           balance    
-        }  
-   }
- }
+        userCreate(input: {username: $username, password: $password, email: $email}){
+            user{
+                id
+                username
+            }
+        }
+    }
 `;
 
 export const getAuthTokenMutation = gql`

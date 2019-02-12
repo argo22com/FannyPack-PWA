@@ -2,18 +2,17 @@ import * as React from "react";
 import {FunctionComponent, ReactNode} from "react";
 import RootState from "../store/rootState";
 import {connect} from "react-redux";
-import {Room_getRooms, Room_getRooms_users} from "../generated-models/generated-types";
 import NavBar from "../components/NavBar";
 import {actionAddPaymentButtonClick, actionOpenMenu} from "../store/actions/uiActions";
 import {actionSetCurrentRoom} from "../store/actions";
+import {MeQuery, RoomBasicFragment} from "../generated-models/generated-types";
+import {QueryResult} from "react-apollo";
+import {withMeGraphql} from "../models/withMe";
 
 interface StateToProps {
-    rooms: Room_getRooms[],
     paymentWindowOpened: boolean,
     menuOpened: boolean,
-    currentRoom: Room_getRooms,
-    loggedUser: string,
-    allUsers: Room_getRooms_users[],
+    currentRoomId: string | null,
 }
 
 interface DispatchToProps {
@@ -22,8 +21,9 @@ interface DispatchToProps {
     changeRoom: typeof actionSetCurrentRoom,
 }
 
-interface Props extends StateToProps, DispatchToProps{
-    children: ReactNode
+interface Props extends StateToProps, DispatchToProps {
+    children: ReactNode,
+    me: MeQuery & QueryResult,
 }
 
 const Layout: FunctionComponent<Props> = (props: Props) => {
@@ -36,31 +36,27 @@ const Layout: FunctionComponent<Props> = (props: Props) => {
         props.openMenu(true);
     };
 
-    const handleRoomChange = (room: Room_getRooms) => {
-        props.changeRoom(room);
+    const handleRoomChange = (room: RoomBasicFragment) => {
+        props.changeRoom(room.id);
     };
 
     const getAvailableRooms = () => {
-        if (!props.allUsers.length) {
+        if (!props.me.me) {
             return []
         }
-        const currentUser = props.allUsers.find((user)=>user.username===props.loggedUser);
-        if (!currentUser) {
-            return []
-        }
-        else return currentUser.rooms
+        return props.me.me.rooms.edges.map(e => e.node);
     };
 
-    return(
+    return (
         <NavBar
             rooms={getAvailableRooms()}
-            currentRoom={props.currentRoom}
+            currentRoomId={props.currentRoomId}
             name={"FANNYP."}
             addPaymentOnClick={handleAddPaymentClick}
             paymentCardActive={props.paymentWindowOpened}
             mainMenuOnClick={handleOpenMenu}
             onRoomChange={handleRoomChange}
-            loggedUser={props.loggedUser}
+            loggedUser={props.me.me ? props.me.me.username : 'Loading...'}
         >
             {props.children}
         </NavBar>
@@ -69,12 +65,9 @@ const Layout: FunctionComponent<Props> = (props: Props) => {
 
 
 const mapStateToProps = (state: RootState): StateToProps => ({
-    rooms: state.rooms,
     paymentWindowOpened: state.paymentWindowOpened,
     menuOpened: state.mainMenuOpened,
-    currentRoom: state.currentRoom,
-    loggedUser: state.loggedUser,
-    allUsers: state.allUsers,
+    currentRoomId: state.currentRoomId,
 });
 
 
@@ -84,4 +77,4 @@ const mapDispatchToProps: DispatchToProps = {
     changeRoom: actionSetCurrentRoom,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Layout);
+export default connect(mapStateToProps, mapDispatchToProps)(withMeGraphql()(Layout));

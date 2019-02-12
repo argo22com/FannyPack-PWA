@@ -1,7 +1,6 @@
 import CardHeader from "@material-ui/core/CardHeader/CardHeader";
 import CardContent from "@material-ui/core/CardContent/CardContent";
 import List from "@material-ui/core/List/List";
-import {getPayments_getPayments} from "../generated-models/generated-types";
 import ListItem from "@material-ui/core/ListItem/ListItem";
 import ListItemText from "@material-ui/core/ListItemText/ListItemText";
 import Typography from "@material-ui/core/Typography/Typography";
@@ -11,6 +10,7 @@ import {Theme, WithStyles} from "@material-ui/core";
 import createStyles from "@material-ui/core/styles/createStyles";
 import withStyles from "@material-ui/core/styles/withStyles";
 import {FunctionComponent} from "react";
+import {PaymentFragment} from "../generated-models/generated-types";
 
 
 const styles = (theme: Theme) => (createStyles({
@@ -20,7 +20,7 @@ const styles = (theme: Theme) => (createStyles({
 }));
 
 interface Props extends WithStyles<typeof styles>{
-    payments: getPayments_getPayments[],
+    payments: PaymentFragment[],
 }
 
 const PaymentsList: FunctionComponent<Props> = (props: Props) => {
@@ -36,7 +36,7 @@ const PaymentsList: FunctionComponent<Props> = (props: Props) => {
         <CardHeader title={"Payments"}/>
         <CardContent>
             <List dense={true}>
-                {payments.map((payment: getPayments_getPayments) => (
+                {payments.map((payment: PaymentFragment) => (
                     <ListItem key={payment.id}>
                         <ListItemText
                             primary={
@@ -46,7 +46,8 @@ const PaymentsList: FunctionComponent<Props> = (props: Props) => {
                             }
                             secondary={
                                 <Typography component="span" color={"primary"}>
-                                    {payment.drawee.username} paid {payment.amount} for {payment.pledger.username}
+                                    {payment.pledger.username} paid kilo for {payment.splitSet.edges.length} users
+                                    {/*todo: use amount and usernames */}
                                 </Typography>
                             }
                         />

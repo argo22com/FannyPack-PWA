@@ -10,8 +10,6 @@ import RoomInfo from "./RoomInfo";
 import LoginScreen from "./LoginScreen";
 import RootState from "../store/rootState";
 import EventHandler from "./EventHandler";
-import {Room_getRooms_users} from "../generated-models/generated-types";
-import WelcomeView from "../components/WelcomeView";
 import Spinner from "../components/Spinner";
 import WelcomeScreen from "./WelcomeScreen";
 
@@ -21,8 +19,8 @@ interface DispatchToProps {
 
 interface StateToProps {
     isLogged: boolean,
-    loggedUser: string,
-    allUsers: Room_getRooms_users[],
+    loggedUser: string | null,
+    currentRoomId: string | null,
 }
 
 interface Props extends DispatchToProps, StateToProps {
@@ -40,25 +38,17 @@ const Root = (props: Props) => {
     };
 
     const userIsNew = () => {
-        if(!props.loggedUser || !props.allUsers.length){
-            return false
-        }
-        const currUser = props.allUsers.find((user)=>user.username===props.loggedUser);
-        if (!currUser){
-            return false
-        }
-        console.log(currUser);
-        return currUser.rooms.length < 1;
+        return false; // TODO: implement
     };
 
     if (isLogged() && !props.isLogged) {
         console.log(props, isLogged());
-        return <Spinner />
+        return <Spinner/>
     }
 
-    if (isLogged() && props.isLogged){
+    if (isLogged() && props.isLogged) {
         if (userIsNew()) {
-            return(
+            return (
                 <div>
                     <Layout>
                         <WelcomeScreen/>
@@ -70,21 +60,23 @@ const Root = (props: Props) => {
         } else {
             return (
                 <div>
-                <Layout>
-                    <Graph/>
-                    <RoomInfo/>
-                    <AddPayment/>
-                    <Menu/>
-                </Layout>
-                <EventHandler/>
+                    <Layout>
+                        <Graph id={props.currentRoomId}/>
+                        <RoomInfo/>
+                        <AddPayment/>
+                        <Menu/>
+                    </Layout>
+                    <EventHandler/>
                 </div>
             );
         }
     } else {
-        return <>
-            <LoginScreen />
-            <EventHandler/>
+        return (
+            <>
+                <LoginScreen/>
+                <EventHandler/>
             </>
+        )
     }
 };
 
@@ -95,7 +87,7 @@ const mapDispatchToProps: DispatchToProps = {
 const mapStateToProps = (state: RootState): StateToProps => ({
     isLogged: state.isLogged,
     loggedUser: state.loggedUser,
-    allUsers: state.allUsers,
+    currentRoomId: state.currentRoomId,
 });
 
 

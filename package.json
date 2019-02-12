@@ -24,16 +24,17 @@
     "build": "react-scripts-ts build",
     "test": "react-scripts-ts test --env=jsdom",
     "eject": "react-scripts-ts eject",
-    "introspect": "apollo-codegen introspect-schema http://localhost:8000/graphql/ --output src/api/schema.json",
-    "generate": "apollo-codegen generate src/generated-models/*.graphql --schema src/api/schema.json --target typescript --output src/generated-models/generated-types.ts --addTypename"
+    "introspect": "apollo-codegen introspect-schema http://localhost:8080/graphql/ --output src/api/schema.json",
+    "generate": "apollo-codegen generate src/**/*.ts --schema src/api/schema.json --target typescript --output src/generated-models/generated-types.ts --addTypename"
   },
   "devDependencies": {
     "@types/jest": "^23.3.9",
     "@types/node": "^10.12.10",
     "@types/react": "^16.4.7",
     "@types/react-dom": "^16.0.6",
+    "apollo-codegen": "^0.19.1",
+    "apollo-link-context": "latest",
     "redux-devtools-extension": "^2.13.7",
-    "typescript": "^3.1.6",
-    "apollo-link-context": "latest"
+    "typescript": "^3.1.6"
   }
 }

@@ -1,22 +1,14 @@
 import {Record} from "immutable";
-import {getPayments_getPayments, Room_getRooms, Room_getRooms_users} from "../generated-models/generated-types";
 import {menuItems} from "../components/MainMenu";
 import {eventProps} from "../screens/EventHandler";
 import {agentType} from "../models/CustomTypes";
 
 export interface IState {
     initialized: boolean,
-    loggedUser: string,
+    loggedUser: string | null,
     isLogged: boolean,
-    allUsers: Room_getRooms_users[],
-    currentRoom: Room_getRooms,
-    matrix: object,
-    rooms: Room_getRooms[],
-    usersInRoom: Room_getRooms_users[],
-    roomPayments: getPayments_getPayments[],
-    roomPledger: string,
-    roomSpending: number,
-    eventProps: eventProps,
+    currentRoomId: string | null,
+    eventProps: eventProps | null,
     eventOpen: boolean,
     paymentWindowOpened: boolean,
     mainMenuOpened: boolean,
@@ -27,39 +19,25 @@ export interface IState {
 
 const RootStateRecord = Record({
     initialized: false,
-    loggedUser: "",
+    loggedUser: null,
     isLogged: false,
-    allUsers: {},
-    currentRoom: {},
-    matrix: {},
-    rooms: {},
-    usersInRoom: {},
-    roomPayments: {},
-    roomPledger: "",
-    roomSpending: 0,
-    eventProps: {},
+    currentRoomId: null,
+    eventProps: null,
     eventOpen: false,
     paymentWindowOpened: false,
     mainMenuOpened: false,
     managementFormOpened: false,
     managementFormType: menuItems.addRoom,
     userAgent: agentType.DEFAULT,
-});
+} as IState);
 
 export default class RootState extends RootStateRecord implements IState {
 
     readonly initialized: boolean;
-    readonly loggedUser: string;
+    readonly loggedUser: string | null;
     readonly isLogged: boolean;
-    readonly allUsers: Room_getRooms_users[];
-    readonly rooms: Room_getRooms[];
-    readonly currentRoom: Room_getRooms;
-    readonly matrix: object;
-    readonly usersInRoom: Room_getRooms_users[];
-    readonly roomPayments: getPayments_getPayments[];
-    readonly roomPledger: string;
-    readonly roomSpending: number;
-    readonly eventProps: eventProps;
+    readonly currentRoomId: string | null;
+    readonly eventProps: eventProps | null;
     readonly eventOpen: boolean;
     readonly paymentWindowOpened: boolean;
     readonly mainMenuOpened: boolean;

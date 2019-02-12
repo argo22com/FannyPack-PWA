@@ -4,7 +4,6 @@ import AppBar from "@material-ui/core/AppBar/AppBar";
 import Typography from "@material-ui/core/Typography/Typography";
 import {Theme, WithStyles} from "@material-ui/core";
 import withStyles from "@material-ui/core/styles/withStyles";
-import {Room_getRooms, Room_getRooms_users} from "../generated-models/generated-types";
 import createStyles from "@material-ui/core/styles/createStyles";
 import Fab from "@material-ui/core/Fab/Fab";
 import AddIcon from '@material-ui/icons/AddOutlined';
@@ -18,17 +17,18 @@ import Menu from "@material-ui/core/Menu/Menu";
 import Chip from "@material-ui/core/Chip/Chip";
 import Avatar from "@material-ui/core/Avatar/Avatar";
 import Paper from "@material-ui/core/Paper/Paper";
+import {RoomBasicFragment} from "../generated-models/generated-types";
 
 interface Props extends WithStyles<typeof styles> {
-    loggedUser: string,
+    loggedUser: string | null,
     children: ReactNode,
     name: String,
-    rooms: Room_getRooms[],
-    currentRoom: Room_getRooms,
+    rooms: RoomBasicFragment[],
+    currentRoomId: string | null,
     addPaymentOnClick: ()=>void,
     paymentCardActive: boolean,
     mainMenuOnClick: ()=>void,
-    onRoomChange: (room: Room_getRooms)=>void,
+    onRoomChange: (room: RoomBasicFragment)=>void,
 }
 
 const styles = (theme: Theme) => (createStyles({
@@ -88,7 +88,7 @@ const NavBar = (props: Props): (JSX.Element | null) => {
     // }
 
     const [anchorEl, setAnchorEl] = useState(null);
-    const [room, setRoom] = useState(props.currentRoom);
+    const [room, setRoom] = useState(props.currentRoomId);
 
     const handleRoomsMenuOpen = (event: any) => {
         setAnchorEl(event.currentTarget)
@@ -100,7 +100,7 @@ const NavBar = (props: Props): (JSX.Element | null) => {
         if (selectedRoomName === '') {
             selectedRoomName = room
         }
-        const selectedRoom: (Room_getRooms|undefined) = props.rooms.find(r => r.name===selectedRoomName);
+        const selectedRoom: (RoomBasicFragment|undefined) = props.rooms.find(r => r.name===selectedRoomName);
         if (!selectedRoom) {
             return
         }
@@ -119,7 +119,7 @@ const NavBar = (props: Props): (JSX.Element | null) => {
             onClose={handleMenuClose}
             className={classes.menu}
         >
-            {props.rooms.map((room: Room_getRooms, index: number) => (
+            {props.rooms.map((room: RoomBasicFragment, index: number) => (
                 <div key={index} className={classes.center}>
                     <MenuItem onClick={handleMenuClose}>{room.name}</MenuItem>
                 </div>
@@ -129,6 +129,7 @@ const NavBar = (props: Props): (JSX.Element | null) => {
 
     const {name, classes, mainMenuOnClick} = props;
     const isMenuOpen = Boolean(anchorEl);
+    const currentRoom = props.currentRoomId && props.rooms.length > 0 ? props.rooms.find(n => n.id === props.currentRoomId) : null;
     return (
         <div style={{display: 'flex', flexDirection: 'column', height: '100vh'}}>
             <AppBar position={"static"} color={"primary"} className={classes.appBar}>
@@ -138,7 +139,7 @@ const NavBar = (props: Props): (JSX.Element | null) => {
                 {props.rooms.length > 0 &&
                     <Chip
                         avatar={<Avatar><PlaceIcon/></Avatar>}
-                        label={props.currentRoom.name}
+                        label={currentRoom ? currentRoom.name : 'Select room'}
                         className={classes.chip}
                         color={"secondary"}
                         onClick={handleRoomsMenuOpen}

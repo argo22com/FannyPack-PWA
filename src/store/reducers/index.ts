@@ -8,22 +8,8 @@ const rootReducer = (state: RootState = defaultState, action: AnyAction): RootSt
     switch (action.type) {
         case ActionTypes.SET_INITIALIZED:
             return state.set("initialized", action.initialized);
-        case ActionTypes.SET_ROOMS:
-            return state.set("rooms", action.rooms);
-        case ActionTypes.SET_ALL_USERS:
-            return state.set("allUsers", action.users);
         case ActionTypes.SET_ACTIVE_ROOM:
-            return state.set("currentRoom", action.currentRoom);
-        case ActionTypes.SET_MATRIX:
-            return state.set("matrix", action.matrix);
-        case ActionTypes.SET_USERS_IN_CURRENT_ROOM:
-            return state.set("usersInRoom", action.users);
-        case ActionTypes.SET_ROOM_PAYMENTS:
-            return state.set("roomPayments", action.payments);
-        case ActionTypes.SET_ROOM_BIGGEST_PLEDGER:
-            return state.set("roomPledger", action.name);
-        case ActionTypes.SET_ROOM_TOTAL_SPENDINGS:
-            return state.set("roomSpending", action.amount);
+            return state.set("currentRoomId", action.currentRoomId);
         case ActionTypes.SET_LOGGED_USER:
             return state.set("loggedUser", action.user);
         case ActionTypes.SET_IS_LOGGED:

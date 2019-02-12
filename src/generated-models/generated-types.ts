@@ -1,113 +1,291 @@
-
-
 /* tslint:disable */
-// This file was automatically generated and should not be edited.
+//  This file was automatically generated and should not be edited.
 
-// ====================================================
-// GraphQL query operation: getMatrix
-// ====================================================
+export interface SplitInputType {
+  userId: string,
+  amount: number,
+};
 
-export interface getMatrix_room {
-  __typename: "RoomType";
-  matrix: string;
-}
+export interface addPaymentMutationVariables {
+  pledgerId: string,
+  name: string,
+  roomId: string,
+  splits: Array< SplitInputType | null >,
+  datetime: string,
+};
 
-export interface getMatrix {
-  room: getMatrix_room | null;
-}
+export interface addPaymentMutation {
+  paymentCreate:  {
+    __typename: "PaymentCreateMutationPayload",
+    payment:  {
+      __typename: "PaymentNode",
+      // The ID of the object.
+      id: string,
+    } | null,
+  } | null,
+};
 
-export interface getMatrixVariables {
-  roomName: string;
-}
+export interface deletePaymentMutationVariables {
+  id: string,
+};
 
+export interface deletePaymentMutation {
+  paymentDelete:  {
+    __typename: "PaymentDeleteMutationPayload",
+    success: boolean | null,
+  } | null,
+};
 
-/* tslint:disable */
-// This file was automatically generated and should not be edited.
+export interface createRoomMutationVariables {
+  name: string,
+};
 
-// ====================================================
-// GraphQL query operation: getPayments
-// ====================================================
+export interface createRoomMutation {
+  roomCreate:  {
+    __typename: "RoomCreateMutationPayload",
+    room:  {
+      __typename: "RoomNode",
+      // The ID of the object.
+      id: string,
+      name: string,
+    } | null,
+  } | null,
+};
 
-export interface getPayments_getPayments_drawee {
-  __typename: "UserType";
-  username: string;  // Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.
-}
+export interface addUserToRoomMutationVariables {
+  roomId: string,
+  userId: string,
+  secret?: string | null,
+};
 
-export interface getPayments_getPayments_pledger {
-  __typename: "UserType";
-  username: string;  // Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.
-}
+export interface addUserToRoomMutation {
+  roomAddUser:  {
+    __typename: "RoomAddUserMutationPayload",
+    user:  {
+      __typename: "UserNode",
+      // The ID of the object.
+      id: string,
+      // Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.
+      username: string,
+    } | null,
+  } | null,
+};
 
-export interface getPayments_getPayments {
-  __typename: "PaymentType";
-  id: any;
-  drawee: getPayments_getPayments_drawee;
-  pledger: getPayments_getPayments_pledger;
-  amount: number;
-  date: any;
-  name: string;
-}
+export interface createUserMutationVariables {
+  username: string,
+  password: string,
+  email: string,
+};
 
-export interface getPayments {
-  getPayments: (getPayments_getPayments | null)[] | null;
-}
+export interface createUserMutation {
+  userCreate:  {
+    __typename: "UserCreateMutationPayload",
+    user:  {
+      __typename: "UserNode",
+      // The ID of the object.
+      id: string,
+      // Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.
+      username: string,
+    } | null,
+  } | null,
+};
 
-export interface getPaymentsVariables {
-  roomName: string;
-}
+export interface tokenAuthMutationVariables {
+  username: string,
+  password: string,
+};
 
+export interface tokenAuthMutation {
+  tokenAuth:  {
+    __typename: "ObtainJSONWebToken",
+    token: string | null,
+  } | null,
+};
 
-/* tslint:disable */
-// This file was automatically generated and should not be edited.
+export interface verifyTokenMutationVariables {
+  token: string,
+};
 
-// ====================================================
-// GraphQL query operation: Room
-// ====================================================
+export interface verifyTokenMutation {
+  verifyToken:  {
+    __typename: "Verify",
+    payload: string | null,
+  } | null,
+};
 
-export interface Room_getRooms_users {
-  __typename: "UserType";
-  id: number,
-  username: string;  // Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.
-  rooms: Room_getRooms[],
-  balance: number,
-}
+export interface MeQuery {
+  me:  {
+    __typename: "UserNode",
+    // The ID of the object.
+    id: string,
+    // Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.
+    username: string,
+    email: string,
+    rooms:  {
+      __typename: "RoomNodeConnection",
+      edges:  Array< {
+        __typename: "RoomNodeEdge",
+        // The item at the end of the edge
+        node:  {
+          __typename: "RoomNode",
+          // The ID of the object.
+          id: string,
+          name: string,
+        } | null,
+      } | null >,
+    } | null,
+  } | null,
+};
 
-export interface Room_getRooms_balanceSet_user {
-  __typename: "UserType";
-  username: string;  // Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.
-}
+export interface RoomQueryVariables {
+  id: string,
+};
 
-export interface Room_getRooms_balanceSet_room {
-  __typename: "RoomType";
-  name: string;
-}
+export interface RoomQuery {
+  // The ID of the object
+  room:  {
+    __typename: "RoomNode",
+    // The ID of the object.
+    id: string,
+    name: string,
+    paymentSet:  {
+      __typename: "PaymentNodeConnection",
+      edges:  Array< {
+        __typename: "PaymentNodeEdge",
+        // The item at the end of the edge
+        node:  {
+          __typename: "PaymentNode",
+          // The ID of the object.
+          id: string,
+          date: string,
+          name: string,
+          amount: number,
+          pledger:  {
+            __typename: "UserNode",
+            // The ID of the object.
+            id: string,
+            // Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.
+            username: string,
+          },
+          splitSet:  {
+            __typename: "SplitNodeConnection",
+            edges:  Array< {
+              __typename: "SplitNodeEdge",
+              // The item at the end of the edge
+              node:  {
+                __typename: "SplitNode",
+                // The ID of the object.
+                id: string,
+                amount: number,
+                user:  {
+                  __typename: "UserNode",
+                  // The ID of the object.
+                  id: string,
+                  // Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.
+                  username: string,
+                },
+              } | null,
+            } | null >,
+          } | null,
+        } | null,
+      } | null >,
+    } | null,
+    userSet:  {
+      __typename: "UserNodeConnection",
+      edges:  Array< {
+        __typename: "UserNodeEdge",
+        // The item at the end of the edge
+        node:  {
+          __typename: "UserNode",
+          // The ID of the object.
+          id: string,
+          // Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.
+          username: string,
+        } | null,
+      } | null >,
+    } | null,
+    balances:  Array< {
+      __typename: "BalanceType",
+      debts: number,
+      payments: number,
+      // Positive = how much the user owes to the room. Negative = user has to get this amount to be fine
+      balance: number,
+      user:  {
+        __typename: "UserNode",
+        // The ID of the object.
+        id: string,
+        // Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.
+        username: string,
+      },
+    } | null >,
+    resolution:  Array< {
+      __typename: "ResolutionStepType",
+      payer:  {
+        __typename: "UserNode",
+        // The ID of the object.
+        id: string,
+        // Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.
+        username: string,
+      },
+      recipient:  {
+        __typename: "UserNode",
+        // The ID of the object.
+        id: string,
+        // Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.
+        username: string,
+      },
+      amount: number,
+    } | null >,
+  } | null,
+};
 
-export interface Room_getRooms_balanceSet {
-  __typename: "BalanceType";
-  user: Room_getRooms_balanceSet_user;
-  balance: number;
-  totalBalance: number;
-  room: Room_getRooms_balanceSet_room;
-}
+export interface RoomBasicFragment {
+  __typename: "RoomNode",
+  // The ID of the object.
+  id: string,
+  name: string,
+};
 
-export interface Room_getRooms {
-  __typename: "RoomType";
-  id: any;
-  name: string;
-  secret?: string;
-}
+export interface UserBasicFragment {
+  __typename: "UserNode",
+  // The ID of the object.
+  id: string,
+  // Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.
+  username: string,
+};
 
-export interface Room {
-  getRooms: (Room_getRooms | null)[] | null;
-}
-
-/* tslint:disable */
-// This file was automatically generated and should not be edited.
-
-//==============================================================
-// START Enums and Input Objects
-//==============================================================
-
-//==============================================================
-// END Enums and Input Objects
-//==============================================================
+export interface PaymentFragment {
+  __typename: "PaymentNode",
+  // The ID of the object.
+  id: string,
+  date: string,
+  name: string,
+  amount: number,
+  pledger:  {
+    __typename: "UserNode",
+    // The ID of the object.
+    id: string,
+    // Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.
+    username: string,
+  },
+  splitSet:  {
+    __typename: "SplitNodeConnection",
+    edges:  Array< {
+      __typename: "SplitNodeEdge",
+      // The item at the end of the edge
+      node:  {
+        __typename: "SplitNode",
+        // The ID of the object.
+        id: string,
+        amount: number,
+        user:  {
+          __typename: "UserNode",
+          // The ID of the object.
+          id: string,
+          // Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.
+          username: string,
+        },
+      } | null,
+    } | null >,
+  } | null,
+};

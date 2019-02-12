@@ -4,9 +4,9 @@ import RootState from "../store/rootState";
 import {actionSendPayment} from "../store/actions";
 import {connect} from "react-redux";
 import Payment, {Transaction} from "../components/Payment";
-import {Room_getRooms, Room_getRooms_users} from "../generated-models/generated-types";
 import {actionAddPaymentButtonClick} from "../store/actions/uiActions";
 import {agentType} from "../models/CustomTypes";
+import {UserBasicFragment} from "../generated-models/generated-types";
 
 interface DispatchToProps {
     sendPayment: typeof actionSendPayment,
@@ -15,19 +15,21 @@ interface DispatchToProps {
 }
 
 interface StateToProps {
-    users: Room_getRooms_users[],
-    loggedUser: string,
-    currentRoom: Room_getRooms,
+    loggedUser: string | null,
+    currentRoomId: string | null,
     shouldRender: boolean,
     agent: agentType
 }
 
-interface Props extends DispatchToProps, StateToProps {}
+interface Props extends DispatchToProps, StateToProps {
+}
 
 
-const AddPayment: FunctionComponent<Props> = (props:Props): JSX.Element => {
+const AddPayment: FunctionComponent<Props> = (props: Props): JSX.Element => {
 
-    if (!props.users.length){
+    const users: UserBasicFragment[] = [];
+
+    if (!users.length) {
         return <>LOADING</>
     }
 
@@ -39,9 +41,9 @@ const AddPayment: FunctionComponent<Props> = (props:Props): JSX.Element => {
     };
 
     const getLoggedUser = () => {
-        const loggedUser = props.users.find(user=>user.username===props.loggedUser);
-        if (!loggedUser){
-            return props.users[0]
+        const loggedUser = users.find(user => user.username === props.loggedUser);
+        if (!loggedUser) {
+            return users[0]
         } else {
             return loggedUser
         }
@@ -49,10 +51,10 @@ const AddPayment: FunctionComponent<Props> = (props:Props): JSX.Element => {
 
 
     return <Payment
-        fullscreen={props.agent===agentType.ANDROID}
+        fullscreen={props.agent === agentType.ANDROID}
         open={props.shouldRender}
         onClose={props.openPaymentWindow}
-        users={props.users}
+        users={users}
         logged_user={getLoggedUser()}
         paymentAction={dispatchPayment}
     />
@@ -60,9 +62,8 @@ const AddPayment: FunctionComponent<Props> = (props:Props): JSX.Element => {
 };
 
 const mapStateToProps = (state: RootState): StateToProps => ({
-    users: state.usersInRoom,
     loggedUser: state.loggedUser,
-    currentRoom: state.currentRoom,
+    currentRoomId: state.currentRoomId,
     shouldRender: state.paymentWindowOpened,
     agent: state.userAgent,
 });

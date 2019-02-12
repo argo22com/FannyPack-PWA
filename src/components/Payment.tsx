@@ -10,7 +10,6 @@ import Input from "@material-ui/core/Input/Input";
 import Select from "@material-ui/core/Select/Select";
 import InputLabel from "@material-ui/core/InputLabel/InputLabel";
 import FormControl from "@material-ui/core/FormControl/FormControl";
-import {Room_getRooms_users} from "../generated-models/generated-types";
 import Checkbox from "@material-ui/core/Checkbox/Checkbox";
 import FormControlLabel from "@material-ui/core/FormControlLabel/FormControlLabel";
 import FormGroup from "@material-ui/core/FormGroup/FormGroup";
@@ -20,11 +19,12 @@ import Selection from "./MultiSelection";
 import Dialog from "@material-ui/core/Dialog/Dialog";
 import DialogContent from "@material-ui/core/DialogContent/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle/DialogTitle";
+import {UserBasicFragment} from "../generated-models/generated-types";
 
 export type Transaction = {
     name: string,
-    drawee: Room_getRooms_users,
-    pledger: Room_getRooms_users,
+    drawee: UserBasicFragment,
+    pledger: UserBasicFragment,
     amount: number,
 }
 
@@ -96,8 +96,8 @@ const MenuProps = {
 };
 
 interface Props extends WithStyles<typeof styles> {
-    logged_user: Room_getRooms_users,
-    users: Room_getRooms_users[],
+    logged_user: UserBasicFragment,
+    users: UserBasicFragment[],
     paymentAction: (transactions: Transaction[]) => void,
     open: boolean,
     fullscreen: boolean,
@@ -118,7 +118,7 @@ const Payment: FunctionComponent<Props> = (props: Props) => {
     const [paymentName, setPaymentName] = useState('');
     const [amount, setAmount] = useState(0);
     const [selectedUsernames, setSelectedUsersnames] = useState<string[]>([]);
-    const [selectedUsers, setSelectedUsers] = useState<Room_getRooms_users[]>([]);
+    const [selectedUsers, setSelectedUsers] = useState<UserBasicFragment[]>([]);
     const [split, setSplit] = useState(false);
     const [payments, setPayments] = useState<Payment>([]);
 
@@ -146,7 +146,7 @@ const Payment: FunctionComponent<Props> = (props: Props) => {
 
     const updateSelectedUsers = (usernames: string[]) => {
 
-        let userObjs: Room_getRooms_users[] = [];
+        let userObjs: UserBasicFragment[] = [];
         usernames.forEach((username: string) => {
             const userObj = users.find((user) => (user.username === username));
 
@@ -250,7 +250,7 @@ const Payment: FunctionComponent<Props> = (props: Props) => {
         props.paymentAction(transactions);
     };
 
-    const getStyles = (user: Room_getRooms_users) => {
+    const getStyles = (user: UserBasicFragment) => {
         return (
             selectedUsernames.indexOf(user.username) === -1
                 ? classes.option
@@ -316,7 +316,7 @@ const Payment: FunctionComponent<Props> = (props: Props) => {
                         )}
                         MenuProps={MenuProps}
                     >
-                        {users.map((user: Room_getRooms_users) => (
+                        {users.map((user: UserBasicFragment) => (
                             <MenuItem key={user.id} value={user.username} className={getStyles(user)}>
                                 {user.username}
                             </MenuItem>
@@ -338,7 +338,7 @@ const Payment: FunctionComponent<Props> = (props: Props) => {
                     />
                     <div className={classes.pledgers}>
                         {
-                            selectedUsers.map((user: Room_getRooms_users) => (
+                            selectedUsers.map((user: UserBasicFragment) => (
                             <TextField
                                 key={user.id}
                                 id="number"
