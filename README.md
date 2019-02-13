@@ -1,4 +1,4 @@
-Argo22 Fanny Pack
+ARGO22 Fanny Pack
 =========================
 
 a PWA app to manage debts in groups with optimization to minimize number of transactions.
@@ -7,16 +7,37 @@ a PWA app to manage debts in groups with optimization to minimize number of tran
 Installation
 ----------------------
 
-create ```env.ts``` in root directiory, use ```env-sample.ts``` as template.
+Create ```env.ts``` in src directory, use ```example.env.ts``` as template
+```
+cp src/example.env.ts src/env.ts
+```
 
+Install dependencies
+```
+yarn
+```
+
+Developement
+----------------------
 #### Start app
-run ```yarn start```
+```
+yarn start
+```
+
 #### Bundle
-run ```yarn bundle```
+```
+yarn bundle
+```
+
 #### Fetch GraphQL schema
-run ```yarn introspect```
+```
+yarn introspect
+```
+
 #### Generate types (must have schema fetched)
-run ```yarn generate```
+```
+yarn generate
+```
 
 -------------------------
 

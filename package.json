@@ -25,7 +25,7 @@
     "test": "react-scripts-ts test --env=jsdom",
     "eject": "react-scripts-ts eject",
     "introspect": "apollo-codegen introspect-schema http://localhost:8080/graphql/ --output src/api/schema.json",
-    "generate": "apollo-codegen generate src/**/*.ts --schema src/api/schema.json --target typescript --output src/generated-models/generated-types.ts --addTypename"
+    "generate": "yarn introspect && apollo-codegen generate src/**/*.ts --schema src/api/schema.json --target typescript --output src/generated-models/generated-types.ts --addTypename"
   },
   "devDependencies": {
     "@types/jest": "^23.3.9",
