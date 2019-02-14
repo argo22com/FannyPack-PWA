@@ -2,10 +2,10 @@ import {Dispatch} from "redux";
 import {client} from "../../api/client";
 import {Transaction} from "../../components/Payment";
 import {
-    addPaymentMutation,
-    addUserToRoomMutation,
-    createRoomMutation,
-    removePaymentMutation
+    addPaymentMutationGql,
+    addUserToRoomMutationGql,
+    createRoomMutationGql,
+    removePaymentMutationGql
 } from "../../models/Mutations";
 import RootState from "../rootState";
 import {formValues} from "../../components/ManagementForm";
@@ -13,7 +13,17 @@ import {menuItems} from "../../components/MainMenu";
 import {actionUserLogonStatus, actionVerifyAuthToken} from "./loginActions";
 import {eventVariant} from "../../components/SnackBar";
 import {eventProps} from "../../screens/EventHandler";
-import {MeQuery, RoomBasicFragment} from "../../generated-models/generated-types";
+import {
+    MeQuery,
+    RoomBasicFragment,
+    RoomCreateMutation,
+    RoomCreateMutationVariables,
+    RoomAddUserMutationVariables,
+    RoomAddUserMutation,
+    PaymentRemoveMutation,
+    PaymentRemoveMutationVariables,
+    PaymentAddMutation, PaymentAddMutationVariables
+} from "../../generated-models/generated-types";
 import {meQuery} from "../../models/Queries";
 
 export enum ActionTypes {
@@ -53,14 +63,21 @@ export const actionSendPayment = (transaction: Transaction) => async (dispatch: 
     let response: any;
     let variables = {
         drawee: transaction.drawee.username,
-        pledger: transaction.pledger.username,
+        pledgerId: transaction.pledger.username,
         amount: transaction.amount,
         name: transaction.name,
         roomId: currentRoomId,
+        // TODO: incorrect data, replace splits and datetime
+        splits: [{
+            userId: transaction.drawee.username,
+            amount: transaction.amount,
+        }],
+        datetime: '',
     };
     try {
-        response = await client.mutate({
-            mutation: addPaymentMutation,
+        console.warn('Lorem Ipsum data "splits" and "datetime" are sending now.');
+        response = await client.mutate<PaymentAddMutation, PaymentAddMutationVariables>({
+            mutation: addPaymentMutationGql,
             variables: variables,
         })
     } catch (error) {
@@ -76,8 +93,8 @@ export const actionRemovePayment = (id: string) => async (dispatch: Dispatch, ge
 
     let response;
     try {
-        response = await client.mutate({
-            mutation: removePaymentMutation,
+        response = await client.mutate<PaymentRemoveMutation, PaymentRemoveMutationVariables>({
+            mutation: removePaymentMutationGql,
             variables: {
                 id: id
             },
@@ -127,12 +144,12 @@ const actionJoinRoom = (room: RoomBasicFragment, password: string | undefined) =
     let response: any;
     let variables = {
         roomId: room.id,
-        username: getState().loggedUser,
+        userId: getState().loggedUser,
         secret: password,
     };
     try {
-        response = await client.mutate({
-            mutation: addUserToRoomMutation,
+        response = await client.mutate<RoomAddUserMutation, RoomAddUserMutationVariables>({
+            mutation: addUserToRoomMutationGql,
             variables: variables,
         })
     } catch (error) {
@@ -184,47 +201,49 @@ export const actionFireMenuEvent = (payload: formValues) => async (dispatch: Dis
 
 
 export const actionCreateRoom = (name: string, password: string | undefined) => async (dispatch: Dispatch, getState: () => RootState) => {
-    console.log('vytvarim novou roomu');
-    let response: any;
-    let variables = {
+    console.log('Creating new room:', name);
+    let response;
+    const variables = {
         name: name,
-        secret: password
+        // TODO: add password support
+        // secret: password,
     };
 
     try {
-        response = await client.mutate({
-            mutation: createRoomMutation,
+        response = await client.mutate<RoomCreateMutation, RoomCreateMutationVariables>({
+            mutation: createRoomMutationGql,
             variables: variables
-        })
+        });
     } catch (error) {
-        console.log(error);
-        return
+        console.error('Room create failed:', error);
+        return null;
     }
-    const newRoom = response.data.createRoom.room;
-    dispatch({type: ActionTypes.SET_ACTIVE_ROOM, currentRoom: newRoom});
-    console.log('nastavuju novou roomu na ', newRoom);
+
+    const newRoom = response.data.roomCreate.room;
+    dispatch({type: ActionTypes.SET_ACTIVE_ROOM, currentRoomId: newRoom.id});
     actionSendEvent("Room " + name + " created", eventVariant.SUCCESS)(dispatch);
     return newRoom;
 };
 
-export const actionAddUserToRoom = (roomId: string, username: string, password?: string) => async (dispatch: Dispatch, getState: () => RootState) => {
-    let response: any;
+export const actionAddUserToRoom = (roomId: string, userId: string, password?: string) => async (dispatch: Dispatch, getState: () => RootState) => {
     let variables = {
         roomId: roomId,
-        username: username,
+        userId: userId,
         secret: password,
     };
     try {
-        response = await client.mutate({
-            mutation: addUserToRoomMutation,
+        await client.mutate<RoomAddUserMutation, RoomAddUserMutationVariables>({
+            mutation: addUserToRoomMutationGql,
             variables: variables,
         })
     } catch (error) {
-        console.log(error);
-        actionResend(error, actionAddUserToRoom(roomId, username, password))(dispatch, getState);
-        return
+        console.error('Add user ${userId} to room ${roomId} failed:', error);
+
+        // TODO: Is it circulus vitiosus?
+        actionResend(error, actionAddUserToRoom(roomId, userId, password))(dispatch, getState);
+        return;
     }
-    actionSendEvent("User " + username + " was added to room", eventVariant.SUCCESS)(dispatch);
+    actionSendEvent("User " + userId + " was added to room", eventVariant.SUCCESS)(dispatch);
 };
 
 export const actionSendEvent = (message: string, variant: eventVariant) => (dispatch: Dispatch) => {

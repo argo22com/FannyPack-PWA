@@ -1,7 +1,7 @@
 import gql from "graphql-tag";
 
-export const addPaymentMutation = gql`
-    mutation addPayment($pledgerId: ID!, $name: String!, $roomId: ID!, $splits: [SplitInputType]!, $datetime: DateTime!) {
+export const addPaymentMutationGql = gql`
+    mutation PaymentAdd($pledgerId: ID!, $name: String!, $roomId: ID!, $splits: [SplitInputType]!, $datetime: DateTime!) {
         paymentCreate (
             input: {
                 pledgerId: $pledgerId,
@@ -18,18 +18,18 @@ export const addPaymentMutation = gql`
     }
 `;
 
-export const removePaymentMutation = gql`
-    mutation deletePayment($id: ID!){
+export const removePaymentMutationGql = gql`
+    mutation PaymentRemove($id: ID!){
         paymentDelete(input: {id: $id}){
             success
         }
     }
 `;
 
-export const createRoomMutation = gql`
-    mutation createRoom($name: String!){
+export const createRoomMutationGql = gql`
+    mutation RoomCreate ($name: String!){
         roomCreate(input: {name: $name}) {
-            room {
+            room{
                 id
                 name
             }
@@ -38,8 +38,8 @@ export const createRoomMutation = gql`
 `;
 
 
-export const addUserToRoomMutation = gql`
-    mutation addUserToRoom($roomId: ID!, $userId: ID!, $secret: String) {
+export const addUserToRoomMutationGql = gql`
+    mutation RoomAddUser($roomId: ID!, $userId: ID!, $secret: String) {
         roomAddUser(input: {userId: $userId, roomId: $roomId, secret: $secret}){
             user{
                 id
@@ -49,8 +49,8 @@ export const addUserToRoomMutation = gql`
     }
 `;
 
-export const createUserMutation = gql`
-    mutation createUser($username: String!, $password: String!, $email: String!) {
+export const createUserMutationGql = gql`
+    mutation UserCreate($username: String!, $password: String!, $email: String!) {
         userCreate(input: {username: $username, password: $password, email: $email}){
             user{
                 id
@@ -60,16 +60,16 @@ export const createUserMutation = gql`
     }
 `;
 
-export const getAuthTokenMutation = gql`
-    mutation tokenAuth($username: String!, $password: String!) {
+export const getAuthTokenMutationGql = gql`
+    mutation TokenGet($username: String!, $password: String!) {
         tokenAuth(username: $username, password: $password){
             token
         }
     }
 `;
 
-export const verifyAuthToken = gql`
-    mutation verifyToken($token: String!) {
+export const verifyAuthTokenGql = gql`
+    mutation TokenVerify($token: String!) {
         verifyToken(token: $token){
             payload
         }
